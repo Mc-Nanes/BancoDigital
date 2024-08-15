@@ -3,7 +3,7 @@ package BancoDigital;
 import java.util.Optional;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SaldoInsuficienteException {
         Cliente cliente1 = new Cliente("João Silva", "123.456.789-00", "Rua A, 123");
         Cliente cliente2 = new Cliente("Maria Oliveira", "987.654.321-00", "Rua B, 456");
 

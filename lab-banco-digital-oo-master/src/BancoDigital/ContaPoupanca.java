@@ -8,15 +8,11 @@ public class ContaPoupanca extends Conta {
         this.taxaJuros = taxaJuros;
     }
 
-    public void aplicarRendimento() {
+    public ContaPoupanca aplicarRendimento() {
         double rendimento = getSaldo() * taxaJuros;
-        if (rendimento > 0) {
-            depositar(rendimento);
-            adicionarTransacao("Rendimento", rendimento);
-            System.out.println("Rendimento aplicado. Novo saldo: R$" + getSaldo());
-        } else {
-            throw new IllegalArgumentException("Rendimento inválido.");
-        }
+        depositar(rendimento); // Método da classe pai, sem mensagem
+        System.out.println("Rendimento aplicado. Novo saldo: R$" + getSaldo());
+        return this;
     }
 
     @Override

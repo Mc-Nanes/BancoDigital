@@ -8,27 +8,29 @@ public class ContaCorrente extends Conta {
         this.limiteCredito = limiteCredito;
     }
 
-    @Override
-    public void sacar(final double valor) throws SaldoInsuficienteException {
-        if (valor <= 0) {
-            throw new IllegalArgumentException("Valor de saque deve ser positivo.");
-        }
-        if (getSaldo() + limiteCredito >= valor) {
-            super.sacar(valor);
-        } else {
-            throw new SaldoInsuficienteException("Saldo insuficiente, mesmo considerando o limite de crédito.");
-        }
+    public double getLimiteCredito() {
+        return limiteCredito;
     }
 
     @Override
-    public void transferir(final double valor, final Iconta destino) throws SaldoInsuficienteException {
+    public ContaCorrente sacar(final double valor) throws SaldoInsuficienteException {
+        validarValorPositivo(valor, "Valor de saque deve ser positivo.");
         if (getSaldo() + limiteCredito >= valor) {
-            this.sacar(valor);
-            destino.depositar(valor);
-            System.out.println("Transferência de R$" + valor + " realizada com sucesso.");
+            super.sacar(valor); // Método da classe pai, sem mensagem
+        } else {
+            throw new SaldoInsuficienteException("Saldo insuficiente, mesmo considerando o limite de crédito.");
+        }
+        return this;
+    }
+
+    @Override
+    public ContaCorrente transferir(final double valor, final Iconta destino) throws SaldoInsuficienteException {
+        if (getSaldo() + limiteCredito >= valor) {
+            super.transferir(valor, destino); // Método da classe pai, sem mensagem
         } else {
             throw new SaldoInsuficienteException("Saldo insuficiente para a transferência, mesmo considerando o limite de crédito.");
         }
+        return this;
     }
 
     @Override

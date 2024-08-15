@@ -1,6 +1,7 @@
 package BancoDigital;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class Conta implements Iconta {
@@ -28,43 +29,59 @@ public abstract class Conta implements Iconta {
         return cliente;
     }
 
-    protected void adicionarTransacao(final String tipo, final double valor) {
-        Transacao transacao = new Transacao(tipo, valor, this);
-        transacoes.add(transacao);
+    private void adicionarTransacao(final String tipo, final double valor) {
+        transacoes.add(new Transacao(tipo, valor, this));
     }
 
     @Override
-    public void depositar(final double valor) {
-        if (valor <= 0) {
-            throw new IllegalArgumentException("Valor de depósito deve ser positivo.");
-        }
+    public Conta depositar(final double valor) {
+        return depositar(valor, true);
+    }
+
+    @Override
+    public Conta depositar(final double valor, final boolean exibirMensagem) {
+        validarValorPositivo(valor, "Valor de depósito deve ser positivo.");
         saldo += valor;
         adicionarTransacao("Depósito", valor);
-        System.out.println("Depósito de R$" + valor + " realizado com sucesso.");
+        if (exibirMensagem) {
+            System.out.println("Depósito de R$" + valor + " realizado com sucesso.");
+        }
+        return this;
     }
 
     @Override
-    public void sacar(final double valor) throws SaldoInsuficienteException {
-        if (valor <= 0) {
-            throw new IllegalArgumentException("Valor de saque deve ser positivo.");
-        }
+    public Conta sacar(final double valor) throws SaldoInsuficienteException {
+        return sacar(valor, true);
+    }
+
+    @Override
+    public Conta sacar(final double valor, final boolean exibirMensagem) throws SaldoInsuficienteException {
+        validarValorPositivo(valor, "Valor de saque deve ser positivo.");
         if (saldo >= valor) {
             saldo -= valor;
             adicionarTransacao("Saque", valor);
-            System.out.println("Saque de R$" + valor + " realizado com sucesso.");
+            if (exibirMensagem) {
+                System.out.println("Saque de R$" + valor + " realizado com sucesso.");
+            }
         } else {
             throw new SaldoInsuficienteException("Saldo insuficiente.");
         }
+        return this;
     }
 
     @Override
-    public void transferir(final double valor, final Iconta destino) throws SaldoInsuficienteException {
-        if (valor <= 0) {
-            throw new IllegalArgumentException("Valor de transferência deve ser positivo.");
+    public Conta transferir(final double valor, final Iconta destino) throws SaldoInsuficienteException {
+        boolean mensagemAnterior = true;
+        try {
+            mensagemAnterior = false; // Desativar exibição de mensagens
+            sacar(valor, false); // Registrar saque sem mensagem
+            destino.depositar(valor, false); // Registrar depósito sem mensagem
+            System.out.println("Transferência de R$" + valor + " realizada com sucesso.");
+        } finally {
+            // Restaurar o estado original da exibição de mensagens
+            mensagemAnterior = true;
         }
-        this.sacar(valor);
-        destino.depositar(valor);
-        System.out.println("Transferência de R$" + valor + " realizada com sucesso.");
+        return this;
     }
 
     @Override
@@ -77,5 +94,15 @@ public abstract class Conta implements Iconta {
         }
     }
 
+    public List<Transacao> getTransacoes() {
+        return Collections.unmodifiableList(transacoes);
+    }
+
     public abstract void mostrarDetalhes();
+
+    protected void validarValorPositivo(double valor, String mensagemErro) {
+        if (valor <= 0) {
+            throw new IllegalArgumentException(mensagemErro);
+        }
+    }
 }

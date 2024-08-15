@@ -1,9 +1,13 @@
 package BancoDigital;
 
 public interface Iconta {
-    void depositar(double valor);
-    void sacar(double valor) throws SaldoInsuficienteException;
-    void transferir(double valor, Iconta destino) throws SaldoInsuficienteException;
+    Iconta depositar(double valor);
+    Iconta depositar(double valor, boolean exibirMensagem);
+
+    Iconta sacar(double valor) throws SaldoInsuficienteException;
+    Iconta sacar(double valor, boolean exibirMensagem) throws SaldoInsuficienteException;
+
+    Iconta transferir(double valor, Iconta destino) throws SaldoInsuficienteException;
+
     void mostrarHistoricoTransacoes();
-    void mostrarDetalhes();
 }
